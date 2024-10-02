@@ -1,0 +1,141 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>kafka</groupId>
+  <artifactId>kafka-learning</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <name>Learning Kafka</name>
+  
+  <dependencies>
+  	<dependency>
+   		<groupId>org.apache.kafka</groupId>
+   		<artifactId>kafka-clients</artifactId>
+   		<version>3.6.1</version>
+  	</dependency>
+  	
+	<dependency>
+	    <groupId>org.slf4j</groupId>
+	    <artifactId>slf4j-api</artifactId>
+	    <version>1.7.36</version> 
+	</dependency>
+	
+	<dependency>
+	    <groupId>org.slf4j</groupId>
+	    <artifactId>slf4j-simple</artifactId>
+	    <version>1.7.36</version> 
+	</dependency>
+	
+	<dependency>
+		<groupId>com.microsoft.playwright</groupId>
+		<artifactId>playwright</artifactId>
+		<version>1.41.2</version>
+	</dependency>
+	
+	<dependency>
+	    <groupId>com.fasterxml.jackson.core</groupId>
+	    <artifactId>jackson-databind</artifactId>
+	    <version>2.13.4</version>
+    </dependency>
+    
+    <!--Used to add the Spark Streaming Dependency-->
+    <dependency>
+        <groupId>org.apache.spark</groupId>
+        <artifactId>spark-streaming_2.12</artifactId>
+        <version>3.3.1</version>
+    </dependency>
+    
+	<dependency>
+	    <groupId>org.apache.spark</groupId>
+	    <artifactId>spark-streaming-kafka-0-10_2.12</artifactId>
+	    <version>3.3.1</version>
+    </dependency>
+    
+    <!--Used to add the core Spark-->
+    <dependency>
+	    <groupId>org.apache.spark</groupId>
+	    <artifactId>spark-sql-kafka-0-10_2.12</artifactId>
+	    <version>3.3.1</version>
+	</dependency>
+	
+	<dependency>
+        <groupId>org.apache.spark</groupId>
+        <artifactId>spark-sql_2.12</artifactId>
+        <version>3.3.1</version> 
+    </dependency>
+	
+	<dependency>
+	    <groupId>org.mongodb.spark</groupId>
+	    <artifactId>mongo-spark-connector_2.12</artifactId>
+	    <version>3.0.2</version>
+	</dependency>
+	
+	<dependency>
+	    <groupId>org.mongodb</groupId>
+	    <artifactId>mongodb-driver-sync</artifactId>
+	    <version>4.8.0</version>
+	</dependency>
+	
+	<dependency>
+	    <groupId>com.google.api-client</groupId>
+	    <artifactId>google-api-client</artifactId>
+	    <version>1.32.1</version>
+	</dependency>
+	
+	<dependency>
+	    <groupId>com.google.apis</groupId>
+	    <artifactId>google-api-services-sheets</artifactId>
+	    <version>v4-rev614-1.18.0-rc</version>
+	</dependency>
+
+    <dependency>
+        <groupId>com.google.cloud</groupId>
+        <artifactId>google-cloud-storage</artifactId>
+        <version>2.42.0</version> 
+    </dependency>
+
+    <dependency>
+        <groupId>com.google.auth</groupId>
+        <artifactId>google-auth-library-credentials</artifactId>
+        <version>1.23.0</version>
+    </dependency>
+
+    <dependency>
+        <groupId>com.google.code.gson</groupId>
+        <artifactId>gson</artifactId>
+        <version>2.10.1</version>
+    </dependency>
+    
+</dependencies>
+
+<build>
+    <plugins>       	 
+       	 <plugin>
+       		<groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <version>3.3.0</version>
+            <configuration>
+                <archive>
+                    <manifest>
+                        <mainClass>com.kafka.consumer.Main</mainClass>
+                    </manifest>
+                </archive>
+                <descriptorRefs>
+                    <descriptorRef>jar-with-dependencies</descriptorRef>
+                </descriptorRefs>
+            </configuration>
+            
+            <executions>
+                <execution>
+                    <id>make-assembly</id>
+                    <phase>package</phase>
+                    <goals>
+                        <goal>single</goal>
+                    </goals>
+                </execution>
+            </executions>
+        </plugin>
+        
+    </plugins>
+</build>
+
+  
+</project>
