@@ -2,7 +2,7 @@
 https://github.com/user-attachments/assets/fa66d649-b162-4961-9066-155446db12bd
 
 ### Overall Diagram
-![image](https://github.com/user-attachments/assets/bce8fce8-adac-49d0-828c-53bd410a5e20)
+![image](https://github.com/user-attachments/assets/aa122d02-d54a-40f1-995d-9ebb14071f88)
 
 ### Diagram breakdown
 1. ```Scrapper.java``` initialized scrapping jobs: The ```Playwright Scrapper``` will initialize the scrapping jobs collect data from Indeed websites, the result of the scrapping will have the data structure of ```List<Map<String, String>>```, where each ```Map<String, String>``` represents for the ```Scrape source``` and ```Scrape value``` respectively.
