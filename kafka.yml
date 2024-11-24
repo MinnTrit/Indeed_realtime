@@ -1,0 +1,107 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: kafka
+spec:
+  replicas: 2 
+  selector:
+    matchLabels:
+      app: kafka
+  template:
+    metadata:
+      labels:
+        app: kafka
+    spec:
+
+     initContainers:
+      - name: init
+        image: busybox
+        command: 
+          - sh
+          - -c
+        args: 
+          - |
+            #Create the unique broker id for each cluster
+            POD_NAME=$(hostname);
+            BROKER_ID=$(echo $POD_NAME | grep -o '[0-9]\+');
+            echo "The current broker id is $BROKER_ID";
+            echo "KAFKA_BROKER_ID=$BROKER_ID" >> /etc/profile.d/broker_id.sh
+            source /etc/profile.d/broker_id.sh
+
+            #Create the unique IP address for each cluster
+            HOST_IP=$(ip addr show eth0 | grep -i 'inet ' | awk '{print $2}' | cut -d'/' -f1)
+            listeningHost=$(echo PLAINTEXT://$HOST_IP:)
+            echo "The advertised host is at $listeningHost"
+            export kafkaPort=$((9092+$BROKER_ID))
+            echo "KAFKA_LISETENERS=PLAINTEXT://0.0.0.0:$kafkaPort" >> /etc/profile.d/advertised_listener.sh
+            echo "KAFKA_PORT=$kafkaPort" >> /etc/profile.d/kafka_port.sh
+            source /etc/profile.d/advertised_listener.sh
+
+            # Verify the changes
+            cat /opt/bitnami/kafka/config/server.properties
+
+            #List out all the items
+            cd /etc/profile.d
+            ls -l
+            cat /etc/profile.d/broker_id.sh
+            cat /etc/profile.d/advertised_listener.sh
+            cat /etc/profile.d/kafka_port.sh
+        volumeMounts:
+          - name: kafka-config-volume
+            mountPath: /etc/profile.d
+
+     containers:
+      - name: kafka
+        image: bitnami/kafka:latest 
+        securityContext:
+          runAsUser: 0
+          runAsGroup: 0
+          allowPrivilegeEscalation: true
+        ports:
+          - containerPort: 9092
+        env:
+          - name: KAFKA_ZOOKEEPER_CONNECT
+            value: "zookeeper:2181"  
+          - name: KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP
+            value: "PLAINTEXT:PLAINTEXT"  
+          - name: ALLOW_ANONYMOUS_LOGIN
+            value: "yes"
+        command:
+          - bash
+          - -c
+          - |
+            apt-get update
+            source /etc/profile.d/broker_id.sh
+            source /etc/profile.d/advertised_listener.sh
+            source /etc/profile.d/kafka_port.sh
+
+            echo "The broker id is $KAFKA_BROKER_ID"
+            echo "The advertising listener is $KAFKA_LISETENERS"
+            echo "The kafka unique port is $kafkaPort"
+
+            cp /opt/bitnami/kafka/config/server.properties.original /opt/bitnami/kafka/config/server.properties
+            cd /opt/bitnami/kafka/config
+
+            sed -i "s|broker.id=0|broker.id=$KAFKA_BROKER_ID|" server.properties
+            sed -i "s|#listeners=PLAINTEXT://:9092|listeners=$KAFKA_LISETENERS|" server.properties
+            sed -i "s|#advertised.listeners=PLAINTEXT://your.host.name:9092|advertised.listeners=PLAINTEXT://172.24.33.81:$KAFKA_PORT|" server.properties
+            sed -i "s|zookeeper.connect=localhost:2181|zookeeper.connect=zookeeper:2181|" server.properties
+            sed -i "s|offsets.topic.replication.factor=1|offsets.topic.replication.factor=2|" server.properties
+            sed -i "s|transaction.state.log.replication.factor=1|transaction.state.log.replication.factor=2|" server.properties
+            # echo "port=9092" >> server.properties
+            # echo "advertised.host.name=172.24.33.81" >> server.properties
+
+            #Print out the configurations
+            cat server.properties
+            
+            #Print out the current directory
+            pwd
+
+            #Start kafka server
+            exec /opt/bitnami/scripts/kafka/entrypoint.sh /opt/bitnami/kafka/bin/kafka-server-start.sh /opt/bitnami/kafka/config/server.properties
+        volumeMounts:
+          - name: kafka-config-volume
+            mountPath: /etc/profile.d
+     volumes: 
+      - name: kafka-config-volume
+        emptyDir: {} 
